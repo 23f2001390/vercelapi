@@ -24,10 +24,7 @@ with open(json_path, 'r') as f:
 marks_dict = {student['name']: student['marks'] for student in students_data}
 
 @app.get("/api")
-@app.get("/")
-async def get_marks(name: List[str] = Query(None)):
-    if not name:
-        raise HTTPException(status_code=400, detail="No names provided")
+async def get_marks(name: List[str] = Query(..., description="Student names")):
     marks = [marks_dict.get(n, None) for n in name]
     if all(mark is None for mark in marks):
         raise HTTPException(status_code=404, detail="No valid names found")
