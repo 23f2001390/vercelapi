@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
+from typing import List
 
 app = FastAPI()
 
@@ -24,7 +25,7 @@ marks_dict = {student['name']: student['marks'] for student in students_data}
 
 @app.get("/api")
 @app.get("/")
-async def get_marks(name: list[str]):
+async def get_marks(name: List[str] = Query(None)):
     if not name:
         raise HTTPException(status_code=400, detail="No names provided")
     marks = [marks_dict.get(n, None) for n in name]
