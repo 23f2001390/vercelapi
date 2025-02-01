@@ -23,6 +23,7 @@ with open(json_path, 'r') as f:
 marks_dict = {student['name']: student['marks'] for student in students_data}
 
 @app.get("/api")
+@app.get("/")
 async def get_marks(name: list[str]):
     if not name:
         raise HTTPException(status_code=400, detail="No names provided")
