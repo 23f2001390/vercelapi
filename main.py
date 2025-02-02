@@ -10,7 +10,9 @@ marks_path = os.path.join(BASE_DIR, "marks.json")
 
 try:
     with open(marks_path, "r") as f:
-        marks_data = json.load(f)
+        marks_list = json.load(f)
+    # Convert list to name->marks mapping
+    marks_data = {item["name"]: item["marks"] for item in marks_list}
 except Exception as e:
     # Log the error (in production you might use a logger)
     print("Error loading marks.json:", e)
