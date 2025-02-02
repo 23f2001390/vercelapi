@@ -1,35 +1,37 @@
+import os
 import json
+from typing import List
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
 
-# Load marks data from marks.json at module load time.
-# (Since the file is bundled with your deployment, this is allowed.)
-with open("marks.json", "r") as f:
-    marks_data = json.load(f)
+# Use a relative path to load marks.json
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+marks_path = os.path.join(BASE_DIR, "marks.json")
+
+try:
+    with open(marks_path, "r") as f:
+        marks_data = json.load(f)
+except Exception as e:
+    # Log the error (in production you might use a logger)
+    print("Error loading marks.json:", e)
+    marks_data = {}
 
 app = FastAPI()
 
-# Enable CORS to allow GET requests from any origin.
+# Enable CORS so GET requests from any origin are allowed.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],            # Allow all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET"],          # Only GET is needed
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
 @app.get("/api")
 def get_marks(name: List[str] = Query(...)):
     """
-    Accepts one or more 'name' query parameters.
-    Returns the marks for those student names in the same order.
-    If a name is not found in the marks data, it returns null for that name.
-    
-    Examples:
-    - /api?name=Alice
-    - /api?name=Alice&name=Bob
+    Returns the marks for the provided names (in the same order as given).
+    If a name is not found, its mark will be returned as null.
     """
-    # Look up the mark for each requested name.
     result = [marks_data.get(n, None) for n in name]
     return {"marks": result}
